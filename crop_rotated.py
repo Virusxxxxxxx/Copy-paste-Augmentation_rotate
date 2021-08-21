@@ -27,7 +27,8 @@ def crop_img_rotated(imgDir, labelDir, save_dir='./data/crops', img_format='png'
 
             for num, label in enumerate(labels):
                 items = label.strip().split(' ')
-                x_c, y_c, width, height, theta = \
+                cls = items[0]
+                (x_c, y_c), (width, height), theta = \
                     longsideformat2cvminAreaRect(float(items[1]), float(items[2]), float(items[3]),
                                                  float(items[4]), float(items[5]) - 179.9)
                 crop_img = rotate(img, x_c, y_c, width, height, theta)
@@ -37,7 +38,7 @@ def crop_img_rotated(imgDir, labelDir, save_dir='./data/crops', img_format='png'
                 # 裁剪后的图片名
                 crop_name = img_name.split('.')[0] + "_crop_" + str(num) + "." + img_format
                 cv2.imwrite(join(save_dir, crop_name), crop_img)  # 裁减得到的旋转矩形框
-                crops_txt.write(os.path.join(save_dir, crop_name) + "\n")  # 文件名写入txt
+                crops_txt.write(os.path.join(save_dir, crop_name) + " " + cls + "\n")  # 文件名写入txt
                 count += 1
         img_label.close()
     crops_txt.close()
@@ -98,39 +99,6 @@ def drawRect(img, pt1, pt2, pt3, pt4, color, lineWidth):
     cv2.line(img, pt2, pt3, color, lineWidth)
     cv2.line(img, pt3, pt4, color, lineWidth)
     cv2.line(img, pt1, pt4, color, lineWidth)
-
-
-def longsideformat2cvminAreaRect(x_c, y_c, longside, shortside, theta_longside):
-    """
-    trans longside format(x_c, y_c, longside, shortside, θ) to minAreaRect(x_c, y_c, width, height, θ)
-    两者区别为:
-            当opencv表示法中width为最长边时（包括正方形的情况），则两种表示方法一致
-            当opencv表示法中width不为最长边 ，则最长边表示法的角度要在opencv的Θ基础上-90度
-    @param x_c: center_x
-    @param y_c: center_y
-    @param longside: 最长边
-    @param shortside: 最短边
-    @param theta_longside: 最长边和x轴逆时针旋转的夹角，逆时针方向角度为负 [-180, 0)
-    @return: ((x_c, y_c),(width, height),Θ)
-            x_c: center_x
-            y_c: center_y
-            width: x轴逆时针旋转碰到的第一条边最长边
-            height: 与width不同的边
-            theta: x轴逆时针旋转与width的夹角，由于原点位于图像的左上角，逆时针旋转角度为负 [-90, 0)
-    """
-    if (theta_longside >= -180 and theta_longside < -90):  # width is not the longest side
-        width = shortside
-        height = longside
-        theta = theta_longside + 90
-    else:
-        width = longside
-        height = shortside
-        theta = theta_longside
-
-    if theta < -90 or theta >= 0:
-        print('当前θ=%.1f，超出opencv的θ定义范围[-90, 0)' % theta)
-
-    return x_c, y_c, width, height, theta
 
 
 if __name__ == "__main__":

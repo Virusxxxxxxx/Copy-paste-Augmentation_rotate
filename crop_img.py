@@ -4,16 +4,6 @@ import os
 import sys
 
 
-def clean_crops():
-    img_dir = [os.path.join('.\\crops', f) for f in os.listdir('crops') if f.endswith('png')]
-    f = open('./crop/small.txt', 'w')
-    for path in img_dir:
-        print(path)
-
-        f.write(path + '\n')
-    f.close()
-
-
 def find_min_size(img_list):
     h_min = 2000  # 最短高
     w_min = 2000  # 最短宽
