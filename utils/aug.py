@@ -1,3 +1,5 @@
+import platform
+
 import cv2 as cv2
 import numpy as np
 import random
@@ -88,8 +90,8 @@ def get_resolution(bg_shape, obj_shape):
     obj_max_size = max(h2, w2)
     bg_min_size = min(h1, w1)
 
-    if obj_max_size > bg_min_size * 0.25:  # 如果obj的最长边比bg的最短边的一半大
-        scale = bg_min_size * 0.1 / obj_max_size  # 缩放系数
+    if obj_max_size > bg_min_size * 0.1:  # 如果obj的最长边比bg的最短边的一半大
+        scale = bg_min_size * 0.05 / obj_max_size  # 缩放系数
         return h2 * scale, w2 * scale
     else:
         return h2, w2
@@ -108,8 +110,10 @@ def copysmallobjects(image_dir, label_dir, save_pic, save_txt, small_img_dir, co
     """
 
     image = cv2.imread(image_dir)
-    image_name = image_dir.split('\\')[-1].split('.')[0]
-    print('当前被增强图片:', image_name)
+    if platform.system().lower() == 'windows':
+        image_name = image_dir.split('\\')[-1].split('.')[0]
+    else:
+        image_name = image_dir.split('/')[-1].split('.')[0]
 
     labels = read_label_txt(label_dir)  # 读取标签
     if len(labels) == 0:
@@ -181,9 +185,16 @@ def copysmallobjects(image_dir, label_dir, save_pic, save_txt, small_img_dir, co
     # cv2.imwrite(join(save_pic, basename(image_dir).replace('.png', '_aug_%s.png' % str(count))), image)
 
     output_label_dir = join(save_txt, image_name + '.txt')  # 完整标签路径
-    output_img_dir = join(save_pic, image_dir.split('\\')[-1])  # 完整图片路径
+    if platform.system().lower() == 'windows':
+        output_img_dir = join(save_pic, image_dir.split('\\')[-1])  # 完整图片路径
+    else:
+        output_img_dir = join(save_pic, image_dir.split('/')[-1])  # 完整图片路径
     # visual(image)
     cv2.imwrite(output_img_dir, image)
+    if count != 0:
+        print('已增强:', image_name)
+    else:
+        print("###增强失败:", image_name)
 
     convert_all_boxes(image.shape, all_boxes, output_label_dir)
 

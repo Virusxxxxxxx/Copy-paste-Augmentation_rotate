@@ -209,7 +209,12 @@ def random_add_patches(obj_shape, all_boxes, bg_shape, paste_number, iou_thresh,
     success_num = 0
     new_bboxes = []
 
+    attempts = 0
     while success_num < paste_number:
+        attempts += 1
+        if attempts == 100:
+            print("未找到合适位置！")
+            break
         # print(success_num)
         new_bbox_x_center, new_bbox_y_center = norm_sampling(center_search_space)  # 随机生成目标中心点
         # 如果小目标贴到该位置有一半出界，就放弃这个位置
@@ -245,12 +250,13 @@ def update_crops_txt(cropsDir, img_format):
     """
         整理完crops之后，使用该函数更新small.txt文件
     """
-    img_list = [os.path.join(cropsDir, f) for f in os.listdir(cropsDir) if f.endswith(img_format)]
+    img_list = [f for f in os.listdir(cropsDir) if f.endswith(img_format)]
     lines = open(join(cropsDir, 'small.txt'), 'r').readlines()
     update = []
     for line in lines:
         fileDir, cls = line.strip().split(' ')
-        if fileDir in img_list:
+        filename = fileDir.split('/')[-1]
+        if filename in img_list:
             update.append(fileDir + ' ' + cls)
     update_file = open(join(cropsDir, 'small.txt'), 'w')
     for item in update:
