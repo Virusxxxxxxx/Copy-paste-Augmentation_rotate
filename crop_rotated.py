@@ -8,12 +8,17 @@ import numpy as np
 from utils.general import *
 
 
-def crop_img_rotated(imgDir, labelDir, save_dir='./data/crops', img_format='png'):
-    check_dir(save_dir)
-    crops_txt = open('data/crops/small.txt', "w", encoding='utf-8')  # 截图下来的小图片存放的路径
+def crop_img_rotated(opt):
+    imgDir = opt.imgDir
+    labelDir = opt.labelDir
+    crops_dir = opt.crops_dir
+    img_format = opt.img_format
+    check_dir(crops_dir)
+
+    crops_txt = open(join(crops_dir, 'small.txt'), "w", encoding='utf-8')  # 截图下来的小图片txt存放的路径
     img_list = glob.glob(imgDir + "/*." + img_format)
     txt_list = glob.glob(labelDir + "/*.txt")
-    print('Total number of pictures:', len(img_list))
+    # print('Total number of pictures:', len(img_list))
 
     count = 0
     for img_path, txt_path in zip(img_list, txt_list):
@@ -37,8 +42,8 @@ def crop_img_rotated(imgDir, labelDir, save_dir='./data/crops', img_format='png'
 
                 # 裁剪后的图片名
                 crop_name = img_name.split('.')[0] + "_crop_" + str(num) + "." + img_format
-                cv2.imwrite(join(save_dir, crop_name), crop_img)  # 裁减得到的旋转矩形框
-                crops_txt.write(os.path.join(save_dir, crop_name) + " " + cls + "\n")  # 文件名写入txt
+                cv2.imwrite(join(crops_dir, crop_name), crop_img)  # 裁减得到的旋转矩形框
+                crops_txt.write(os.path.join(crops_dir, crop_name) + " " + cls + "\n")  # 文件名写入txt
                 count += 1
         img_label.close()
     crops_txt.close()
@@ -47,18 +52,32 @@ def crop_img_rotated(imgDir, labelDir, save_dir='./data/crops', img_format='png'
 
 
 def rotate(img, x_c, y_c, w, h, angle):
-    # check_dir(cropDir)
+    """
+    1.计算要裁剪区域四边形的相对水平方向的旋转角度；
+    2.将原图旋转该角度，以使得要裁剪的区域旋转到水平方向；
+    3.将要裁剪区域的坐标做相应的转换，转换为旋转后的坐标；
+    4.对该区域进行裁剪。
+    https://www.jianshu.com/p/e7cd95f97b84
+    @return:
+    """
 
     print(x_c, y_c, w, h, angle)
 
     height = img.shape[0]  # 原始图像高度
     width = img.shape[1]  # 原始图像宽度
-    rotateMat = cv2.getRotationMatrix2D((width / 2, height / 2), angle, 1)  # 按angle角度旋转图像
+    rotateMat = cv2.getRotationMatrix2D((width / 2, height / 2), angle, 1)  # 获得图像绕着中点的旋转矩阵
+    """
+        rotateMat = [ cosθ sinθ dx
+                     -sinθ cosθ dy ]
+    """
+
+    # 计算旋转后的宽高
     heightNew = int(width * fabs(sin(radians(angle))) + height * fabs(cos(radians(angle))))
     widthNew = int(height * fabs(sin(radians(angle))) + width * fabs(cos(radians(angle))))
-
+    # 调整旋转后图像中心
     rotateMat[0, 2] += (widthNew - width) / 2
     rotateMat[1, 2] += (heightNew - height) / 2
+    # 按照刚才获得的旋转矩阵，宽，高 变换图像
     imgRotation = cv2.warpAffine(img, rotateMat, (widthNew, heightNew), borderValue=(255, 255, 255))
     # 反归一化
     x_c *= width
@@ -102,6 +121,5 @@ def drawRect(img, pt1, pt2, pt3, pt4, color, lineWidth):
 
 
 if __name__ == "__main__":
-    data_root = './data/images'
-    txt_save = './data/yolo_labels_rotated'
-    crop_img_rotated(data_root, txt_save, img_format='png')
+    opt = parse_opt()
+    crop_img_rotated(opt)

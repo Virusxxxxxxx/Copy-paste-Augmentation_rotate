@@ -88,8 +88,8 @@ def get_resolution(bg_shape, obj_shape):
     obj_max_size = max(h2, w2)
     bg_min_size = min(h1, w1)
 
-    if obj_max_size > bg_min_size * 0.5:  # 如果obj的最长边比bg的最短边的一半大
-        scale = bg_min_size * 0.25 / obj_max_size  # 缩放系数
+    if obj_max_size > bg_min_size * 0.25:  # 如果obj的最长边比bg的最短边的一半大
+        scale = bg_min_size * 0.1 / obj_max_size  # 缩放系数
         return h2 * scale, w2 * scale
     else:
         return h2, w2
@@ -106,8 +106,6 @@ def copysmallobjects(image_dir, label_dir, save_pic, save_txt, small_img_dir, co
     @param count: 添加个数
     @return:
     """
-    check_dir(save_txt)
-    check_dir(save_pic)
 
     image = cv2.imread(image_dir)
     image_name = image_dir.split('\\')[-1].split('.')[0]
@@ -173,8 +171,8 @@ def copysmallobjects(image_dir, label_dir, save_pic, save_txt, small_img_dir, co
                 # visual(image)
 
                 # print("end try")
-            except cv2.Error:
-                print("Error: cv2.error happend in {}".format(small_obj_dir.split('\\')[-1]))
+            except ValueError:
+                print(ValueError)
                 continue
 
     # print('before {} is ok'.format(image_dir))

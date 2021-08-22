@@ -1,3 +1,4 @@
+import argparse
 import sys
 sys.path.append('utils')
 from utils.YOLO_Transform import drawLongsideFormatimg
@@ -16,9 +17,14 @@ from utils.aug import *
 #             'soccer-ball-field': 10, 'roundabout': 11, 'harbor': 12,
 #             'swimming-pool': 13, 'helicopter': 14, 'container-crane': 15}
 
-def copy_paste(imgDir, labelDir, outputDir, img_format='png'):
 
-    count = 15  # 更改每次在原图上添加多少个小目标
+def copy_paste(opt):
+    imgDir = opt.imgDir  # 待增强的图片路径
+    labelDir = opt.labelDir  # 待增强的图片标签路径
+    outputDir = opt.outputDir
+    img_format = opt.img_format
+    crops_dir = opt.crops_dir
+    count = int(opt.count)  # 更改每次在原图上添加多少个小目标
 
     # 指定增强后的输出路径
     save_pic = join(outputDir, 'images')
@@ -30,7 +36,7 @@ def copy_paste(imgDir, labelDir, outputDir, img_format='png'):
     imgs_dir = [os.path.join(imgDir, f) for f in os.listdir(imgDir) if f.endswith(img_format)]
     labels_dir = [os.path.join(labelDir, f) for f in os.listdir(labelDir) if f.endswith('txt')]
 
-    small_dir = './data/crops/small.txt'
+    small_dir = join(crops_dir, 'small.txt')
     small = [f.strip() for f in open(small_dir).readlines()]
     random.shuffle(small)  # 打乱顺序
 
@@ -47,19 +53,12 @@ def copy_paste(imgDir, labelDir, outputDir, img_format='png'):
 
 
 if __name__ == "__main__":
+    opt = parse_opt()
     # 更新筛选后的裁剪图片
-    update_crops_txt('./data/crops', 'png')
+    update_crops_txt(opt.crops_dir, opt.img_format)
 
-    imgDir = './data/images'  # 待增强的图片路径
-    labelDir = './data/yolo_labels_rotated'  # 待增强的图片标签路径
-    outputDir = './output/'
-    copy_paste(imgDir, labelDir, outputDir, 'png')
+    copy_paste(opt)
 
     # 画图验证标签正确性
-    outputImgPath = './output/images'
-    outputTxtPath = './output/labels'
-    outputImgLabelPath = './output/images_labels'
-    drawLongsideFormatimg(imgpath=outputImgPath,
-                          txtpath=outputTxtPath,
-                          dstpath=outputImgLabelPath,
+    drawLongsideFormatimg(outputPath=opt.outputDir,
                           extractclassname=util.classnames_v1_5)

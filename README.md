@@ -24,19 +24,32 @@
 ```
 
 `2. 裁剪小目标`
-* 修改`crop_rotated.py`中的`data_root`和`txt_save`为你的图片和标签路径（
-  默认图片路径`./data/images` 标签路径`./data/yolo_labels_rotated` ） 
 * 运行`crop_rotated.py`
+  * `--imgDir`指定待剪裁图片路径，默认图片路径`./data/images` 
+  * `--labelDir`指定待剪裁图片标签路径，默认标签路径`./data/yolo_labels_rotated` 
+  * `--crops_dir`指定裁剪后的图片输出路径，默认路径`./data/crops`
+  * `--img_format`指定图片后缀格式，默认`png`
+```angular2html
+    python crop_rotated.py
+```
 * 裁剪后的图像保存在`./data/crops`，筛选裁剪后的小目标，`small.txt`保存裁剪图像的目录和类别，不需要手动更新，在图像增强之前会自动扫描目录。
 
 
-`3. 图像增强` 
-* 修改待增强的图片路径`imgDir`和标签路径`labelDir`
+`3. 图像增强`
 * 运行`copy_paste.py`
+  * `--imgDir`指定待增强的图片路径，默认图片路径`./data/images` 
+  * `--labelDir`指定待增强图片标签路径，默认标签路径`./data/yolo_labels_rotated` 
+  * `--crops_dir`指定裁剪后的图片输出路径，默认路径`./data/crops`
+  * `--img_format`指定图片后缀格式，默认`png`
+  * `--outputDir`指定增强输出结果路径，默认`./output`
+  * `--count`指定每次在原图上添加多少个小目标，默认`5`
+```angular2html
+    python crop_rotated.py --count 10
+```
 * 增强图像保存在`./output/images`，标签保存在`./output/labels`
 * 效果如下图：
 
-![detection_result_before_merge1](./output/images_labels/P0129_.png)
+![output](./output/images_labels/P0129_.png)
 
 ## 参考
 感谢以下的项目

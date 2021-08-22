@@ -1,4 +1,6 @@
+import argparse
 import os
+import shutil
 from os.path import join
 
 import cv2
@@ -49,8 +51,9 @@ def load_txt_labels(label_dir):
 
 
 def check_dir(dir):
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+    if os.path.exists(dir):
+        shutil.rmtree(dir)  # delete output folder
+    os.makedirs(dir)  # make new output folder
 
 
 def drawOneRectAndShow(img, rect):
@@ -251,10 +254,10 @@ def update_crops_txt(cropsDir, img_format):
             update.append(fileDir + ' ' + cls)
     update_file = open(join(cropsDir, 'small.txt'), 'w')
     for item in update:
-        print(item)
+        # print(item)
         update_file.writelines(item + '\n')
     update_file.close()
-    print("Update Success ✅")
+    print("Update Crops Success ✅")
 
 
 def rotate_bound(image, angle):
@@ -286,6 +289,7 @@ def rotate_bound(image, angle):
 
 
 def visual(img):
+    cv2.namedWindow("", cv2.WINDOW_NORMAL)
     cv2.imshow("", img)
     cv2.waitKey(0)
 
@@ -378,6 +382,19 @@ def cvminAreaRect2longsideformat(x_c, y_c, width, height, theta):
         return False
 
     return x_c, y_c, longside, shortside, theta_longside
+
+
+def parse_opt(known=False):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--imgDir', type=str, default='./data/images', help='Dir of pictures to be crop')
+    parser.add_argument('--labelDir', type=str, default='./data/yolo_labels_rotated', help='The label of the cut picture')
+    parser.add_argument('--img_format', type=str, default='png', help='img format')
+    parser.add_argument('--crops_dir', type=str, default='./data/crops', help='Path to save the crops')
+    parser.add_argument('--outputDir', type=str, default='./output/', help='Path to augmentation')
+    parser.add_argument('--count', type=str, default='5', help='Number of augmentation to each image')
+
+    opt = parser.parse_known_args()[0] if known else parser.parse_args()
+    return opt
 
 # if __name__ == "__main__":
 # update_crops_txt('./data/crops', 'png')

@@ -3,7 +3,7 @@ import sys
 import codecs
 import numpy as np
 
-import shapely.geometry as shgeo
+# import shapely.geometry as shgeo
 import os
 import re
 import math

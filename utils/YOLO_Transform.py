@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from os.path import join
+
 import dota_utils as util
 import os
 import numpy as np
@@ -206,28 +208,31 @@ def cvminAreaRect2longsideformat(x_c, y_c, width, height, theta):
 
     return x_c, y_c, longside, shortside, theta_longside
 
-def drawLongsideFormatimg(imgpath, txtpath, dstpath, extractclassname, thickness=2):
+
+def drawLongsideFormatimg(outputPath, extractclassname, thickness=2):
     """
     根据labels绘制边框(label_format:classid, x_c_normalized, y_c_normalized, longside_normalized, shortside_normalized, Θ)
-    :param imgpath: the path of images
-    :param txtpath: the path of txt in longside format
-    :param dstpath: the path of image_drawed
+    :param outputPath: the base path of output
+    :param dstPath: the path of image_drawed
     :param extractclassname: the category you selected
     """
-    if os.path.exists(dstpath):
-        shutil.rmtree(dstpath)  # delete output folder
-    os.makedirs(dstpath)  # make new output folder
+    imgPath = join(outputPath, 'images')
+    txtPath = join(outputPath, 'labels')
+    dstPath = join(outputPath, 'images_labels')
+    check_dir(dstPath)
+
+
     # 设置画框的颜色    colors = [[178, 63, 143], [25, 184, 176], [238, 152, 129],....,[235, 137, 120]]随机设置RGB颜色
     colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(len(extractclassname))]
-    filelist = util.GetFileFromThisRootDir(txtpath)  # fileist=['/.../P0005.txt', ..., /.../P000?.txt]
+    filelist = util.GetFileFromThisRootDir(txtPath)  # fileist=['/.../P0005.txt', ..., /.../P000?.txt]
     for fullname in filelist:  # fullname='/.../P000?.txt'
         objects = util.parse_longsideformat(fullname)
         '''
         objects[i] = [classid, x_c_normalized, y_c_normalized, longside_normalized, shortside_normalized, theta]
         '''
         name = os.path.splitext(os.path.basename(fullname))[0]  # name='P000?'
-        img_fullname = os.path.join(imgpath, name + '.png')  # img_fullname='/.../P000?.png'
-        img_savename = os.path.join(dstpath, name + '_.png')  # img_fullname='/.../_P000?.png'
+        img_fullname = os.path.join(imgPath, name + '.png')  # img_fullname='/.../P000?.png'
+        img_savename = os.path.join(dstPath, name + '_.png')  # img_fullname='/.../_P000?.png'
         img = Image.open(img_fullname)  # 图像被打开但未被读取
         img_w, img_h = img.size
         img = cv2.imread(img_fullname)  # 读取图像像素
@@ -302,9 +307,6 @@ if __name__ == '__main__':
     # txtPath = '../data/yolo_labels_rotated'
     # rotatedPath = '../data/yolo_labels_rotated'
     drawDir = '../output/images_labels'
-
-    check_dir(imgPath)
-    check_dir(txtPath)
     # check_dir(rotatedPath)
     check_dir(drawDir)
 
@@ -313,7 +315,7 @@ if __name__ == '__main__':
     #                     './examplesplit/yolo_labels_rotated',
     #                     util.classnames_v1_5)
 
-    drawLongsideFormatimg(imgpath=imgPath,
-                          txtpath=txtPath,
-                          dstpath=drawDir,
-                          extractclassname=util.classnames_v1_5)
+    # drawLongsideFormatimg(imgpath=imgPath,
+    #                       txtpath=txtPath,
+    #                       dstPath=drawDir,
+    #                       extractclassname=util.classnames_v1_5)
