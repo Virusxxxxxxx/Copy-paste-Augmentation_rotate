@@ -250,19 +250,16 @@ def update_crops_txt(cropsDir, img_format):
     """
         整理完crops之后，使用该函数更新small.txt文件
     """
-    img_list = [f for f in os.listdir(cropsDir) if f.endswith(img_format)]
-    lines = open(join(cropsDir, 'small.txt'), 'r').readlines()
-    update = []
-    for line in lines:
-        fileDir, cls = line.strip().split(' ')
-        filename = fileDir.split('/')[-1]
-        if filename in img_list:
-            update.append(fileDir + ' ' + cls)
-    update_file = open(join(cropsDir, 'small.txt'), 'w')
-    for item in update:
-        # print(item)
-        update_file.writelines(item + '\n')
-    update_file.close()
+    img_list = []
+    for _, _, filenames in os.walk(cropsDir):
+        for filename in filenames:
+            if filename.endswith(img_format):
+                img_list.append(filename)
+    txt_file = open(join(cropsDir, 'small.txt'), 'w')
+    for item in img_list:
+        cls = item.split('_')[0]
+        txt_file.writelines(cropsDir + '/' + item + ' ' + cls + '\n')
+    txt_file.close()
     print("Update Crops Success ✅")
 
 

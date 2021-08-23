@@ -41,9 +41,12 @@ def crop_img_rotated(opt):
                 # cv2.waitKey(0)
 
                 # 裁剪后的图片名
-                crop_name = img_name.split('.')[0] + "_crop_" + str(num) + "." + img_format
-                cv2.imwrite(join(crops_dir, crop_name), crop_img)  # 裁减得到的旋转矩形框
-                crops_txt.write(crops_dir + '/' + crop_name + " " + cls + "\n")  # 文件名写入txt
+                try:
+                    crop_name = cls + '_' + img_name.split('.')[0] + "_crop_" + str(num) + "." + img_format
+                    cv2.imwrite(join(crops_dir, crop_name), crop_img)  # 裁减得到的旋转矩形框
+                    crops_txt.write(crops_dir + '/' + crop_name + " " + cls + "\n")  # 文件名写入txt
+                except cv2.error:
+                    print("裁剪失败:", img_name.split('.')[0])
                 count += 1
         img_label.close()
     crops_txt.close()

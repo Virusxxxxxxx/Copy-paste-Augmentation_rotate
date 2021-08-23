@@ -32,7 +32,11 @@
 ```angular2html
     python crop_rotated.py
 ```
-* 裁剪后的图像保存在`./data/crops`，筛选裁剪后的小目标，`small.txt`保存裁剪图像的目录和类别，不需要手动更新，在图像增强之前会自动扫描目录。
+* 裁剪后的图像保存在`./data/crops`，筛选裁剪后的小目标，`small.txt`保存裁剪图像的目录和类别，不需要手动更新，在图像增强之前会自动扫描目录。  
+* crops图片的文件名格式如下：
+```
+  {classID}_{filename}_crop_{num}.png
+```
 
 
 `3. 图像增强`
