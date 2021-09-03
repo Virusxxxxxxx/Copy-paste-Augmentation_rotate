@@ -34,7 +34,12 @@ def copy_paste(opt):
 
     # 获取待增强的图像路径，以及标签路径
     imgs_dir = [os.path.join(imgDir, f) for f in os.listdir(imgDir) if f.endswith(img_format)]
-    labels_dir = [os.path.join(labelDir, f) for f in os.listdir(labelDir) if f.endswith('txt')]
+    labels_dir = []
+    for dir in imgs_dir:
+        dir = dir.replace(img_format, 'txt')
+        dir = dir.replace(imgDir, labelDir)
+        labels_dir.append(dir)
+    # labels_dir = [os.path.join(labelDir, f) for f in os.listdir(labelDir) if f.endswith('txt')]
 
     small_dir = join(crops_dir, 'small.txt')
     small = [f.strip() for f in open(small_dir).readlines()]
@@ -60,5 +65,5 @@ if __name__ == "__main__":
     copy_paste(opt)
 
     # 画图验证标签正确性
-    # drawLongsideFormatimg(outputPath=opt.outputDir,
-    #                       extractclassname=util.classnames_v1_5)
+    drawLongsideFormatimg(outputPath=opt.outputDir,
+                          extractclassname=util.classnames_v1_5)
