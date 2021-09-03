@@ -65,5 +65,5 @@ if __name__ == "__main__":
     copy_paste(opt)
 
     # 画图验证标签正确性
-    drawLongsideFormatimg(outputPath=opt.outputDir,
-                          extractclassname=util.classnames_v1_5)
+    # drawLongsideFormatimg(outputPath=opt.outputDir,
+    #                       extractclassname=util.classnames_v1_5)
